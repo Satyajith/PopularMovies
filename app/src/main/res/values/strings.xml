@@ -7,4 +7,5 @@
     <string name="popular">PopularMovies</string>
     <string name="top_rated">TopRatedMovies</string>
     <string name="movie_detail">MovieDetail</string>
+    <string name="connection_error">Please check your internet connection!</string>
 </resources>

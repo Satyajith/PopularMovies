@@ -10,12 +10,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.android.popularmoviesapplication.adapter.MoviesAdapter;
 import com.example.android.popularmoviesapplication.viewmodel.MoviesActivityViewModel;
@@ -37,6 +40,7 @@ public class MoviesActivity extends AppCompatActivity {
     private ProgressBar loading;
     private GridLayoutManager layoutManager;
     private MovieClickHandler clickHandler;
+    private TextView errorTv;
     public static final String MOVIE_ITEM = "movie";
 
     @Override
@@ -47,6 +51,7 @@ public class MoviesActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(MoviesActivityViewModel.class);
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_movies);
         clickHandler = new MovieClickHandler(MoviesActivity.this);
+        errorTv = dataBinding.textViewErrorMessage;
 
         initViews();
         initToolbar();
@@ -66,8 +71,8 @@ public class MoviesActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(getResources().getColor(R.color.colorBackground));
     }
 
-    void setToolbarTitle(String title){
-        if(getSupportActionBar() != null)
+    void setToolbarTitle(String title) {
+        if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(title);
     }
 
@@ -80,42 +85,57 @@ public class MoviesActivity extends AppCompatActivity {
     }
 
     void showRecyclerView() {
+        errorTv.setVisibility(View.INVISIBLE);
         moviesRecView.setVisibility(View.VISIBLE);
         loading.setVisibility(View.INVISIBLE);
     }
 
     void hideRecyclerView() {
+        errorTv.setVisibility(View.INVISIBLE);
         moviesRecView.setVisibility(View.INVISIBLE);
         loading.setVisibility(View.VISIBLE);
     }
 
+    void showErrorMessage(){
+        errorTv.setVisibility(View.VISIBLE);
+        moviesRecView.setVisibility(View.INVISIBLE);
+        loading.setVisibility(View.INVISIBLE);
+    }
 
     void getPopularMovies() {
         hideRecyclerView();
         moviesList = new ArrayList<>();
-        viewModel.getPopularMovies().observe(this, new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(List<Movie> movies) {
-                isPopular = false;
-                setToolbarTitle(getString(R.string.popular));
-                moviesList = movies;
-                updateRecView();
-            }
-        });
+        if (isNetworkAvailable())
+            viewModel.getPopularMovies().observe(this, new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(List<Movie> movies) {
+                    isPopular = false;
+                    setToolbarTitle(getString(R.string.popular));
+                    moviesList = movies;
+                    updateRecView();
+                }
+            });
+        else {
+            showErrorMessage();
+        }
     }
 
     void getTopRatedMovies() {
         hideRecyclerView();
         moviesList = new ArrayList<>();
-        viewModel.getTopRatedMovies().observe(this, new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(List<Movie> movies) {
-                isPopular = true;
-                setToolbarTitle(getString(R.string.top_rated));
-                moviesList = movies;
-                updateRecView();
-            }
-        });
+        if (isNetworkAvailable())
+            viewModel.getTopRatedMovies().observe(this, new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(List<Movie> movies) {
+                    isPopular = true;
+                    setToolbarTitle(getString(R.string.top_rated));
+                    moviesList = movies;
+                    updateRecView();
+                }
+            });
+        else{
+            showErrorMessage();
+        }
     }
 
     @Override
@@ -148,6 +168,13 @@ public class MoviesActivity extends AppCompatActivity {
         popular.setVisible(isPopular);
         top.setVisible(!isPopular);
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     public class MovieClickHandler {
