@@ -1,0 +1,15 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+    </style>
+
+    <!--We need to add a dark action bar since it colors the icon black, and that's what we need-->
+    <style name="AppTheme.Appbar" parent="@style/Theme.MaterialComponents.Light.DarkActionBar">
+
+    </style>
+</resources>

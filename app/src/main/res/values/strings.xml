@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">PopularMovies</string>
+    <!-- TODO: Please add your tmdb api_key below -->
+    <string name="api_key"></string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="filter">Filter</string>
+    <string name="popular">PopularMovies</string>
+    <string name="top_rated">TopRatedMovies</string>
+    <string name="movie_detail">MovieDetail</string>
+</resources>
